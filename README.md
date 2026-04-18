@@ -35,7 +35,7 @@ https://raw.githubusercontent.com/kevinsaucier/cloud/refs/heads/main/fpp_preseed
 
 Login as `root` and run:
 
-# Generate/Verify SSH key for root user
+Generate/Verify SSH key for root user
 ```bash
 # Ensure root SSH key exists
 if ! ls /root/.ssh/id_*.pub >/dev/null 2>&1; then
@@ -45,7 +45,7 @@ if ! ls /root/.ssh/id_*.pub >/dev/null 2>&1; then
 fi
 ```
 
-# To allow SSH access directly to the FPP host
+To allow SSH access directly to the FPP host
 ```bash
 # Enable root SSH (preseed does NOT fully handle this)
 sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -59,26 +59,26 @@ systemctl restart ssh
 
 ## 3. Install FPP
 
-# Copy the script from github and give it execute permissions
+Copy the script from github and give it execute permissions
 ```bash
 cd /root
 wget -O /root/FPP_Install.sh https://raw.githubusercontent.com/FalconChristmas/fpp/master/SD/FPP_Install.sh
 chmod +x /root/FPP_Install.sh
 ```
 
-# Patch for Debian 13 on VM compatibility (these steps fail when building on the VM so bypass the failure
+Patch for Debian 13 on VM compatibility (these steps fail when building on the VM so bypass the failures)
 ```bash
 sed -i 's/systemctl stop unattended-upgrades/systemctl stop unattended-upgrades || true/' /root/FPP_Install.sh
 sed -i 's/systemctl disable unattended-upgrades/systemctl disable unattended-upgrades || true/g' /root/FPP_Install.sh
 sed -i 's/systemctl disable beagle-flasher-init-shutdown.service/systemctl disable beagle-flasher-init-shutdown.service || true/' /root/FPP_Install.sh
 ```
 
-# Install FPP
+Install FPP
 ```bash
 ./FPP_Install.sh
 ```
 
-# Reboots
+Reboot the VM
 ```bash
 reboot
 ```
