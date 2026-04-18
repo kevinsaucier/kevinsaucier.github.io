@@ -108,7 +108,7 @@ http://<server-ip>
 
 ## 1. Download the script and copy it to a directory on the Primary server (I use /home/fpp)
 
-> https://kevinsaucier.github.io/blob/main/fpp_vm/SyncFPP_Primary2Backup.sh
+> https://kevinsaucier.github.io/fpp_vm/SyncFPP_Primary2Backup.sh
 
 Grant execute on Primary:
 
