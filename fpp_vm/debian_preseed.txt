@@ -1,0 +1,74 @@
+### Locale / Keyboard
+d-i debian-installer/locale string en_US
+d-i keyboard-configuration/xkb-keymap select us
+
+### Network
+d-i netcfg/choose_interface select auto
+d-i netcfg/get_hostname string fpp
+d-i netcfg/get_domain string local
+
+### Time
+d-i time/zone string America/New_York
+d-i clock-setup/utc boolean true
+d-i clock-setup/ntp boolean true
+
+### Root user (IMPORTANT)
+d-i passwd/root-login boolean true
+d-i passwd/root-password password changeme
+d-i passwd/root-password-again password changeme
+
+### Disable normal user
+d-i passwd/make-user boolean false
+
+### Disk (LVM full disk)
+d-i partman-auto/method string lvm
+d-i partman-auto/disk string /dev/disk/by-id/*
+
+d-i partman-auto/init_automatically_partition select biggest_free
+d-i partman-auto/choose_recipe select atomic
+
+# LVM cleanup (important for re-installs/templates)
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/device_remove_lvm_span boolean true
+d-i partman-lvm/purge_lvm_from_device boolean true
+
+# RAID cleanup (safe even if unused)
+d-i partman-md/device_remove_md boolean true
+
+# Confirm everything automatically
+d-i partman-auto/confirm boolean true
+
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+
+d-i partman-md/confirm boolean true
+d-i partman-md/confirm_nooverwrite boolean true
+
+d-i partman-partitioning/confirm_write_new_label boolean true
+
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+### Packages (LEAN)
+tasksel tasksel/first multiselect standard, ssh-server
+
+### APT behavior (avoid surprises)
+d-i apt-setup/use_mirror boolean true
+d-i apt-setup/security_host string security.debian.org
+
+### Bootloader
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/bootdev string default
+
+### Disable popularity contest
+popularity-contest popularity-contest/participate boolean false
+
+### Skip firmware prompts
+d-i hw-detect/load_firmware boolean true
+
+### Avoid CDROM repo leftovers
+d-i apt-setup/cdrom/set-first boolean false
+
+### Finish
+d-i finish-install/reboot_in_progress note
