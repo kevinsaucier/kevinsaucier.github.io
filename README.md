@@ -20,7 +20,7 @@ Boot the VM using the Debian ISO:
 Advanced Options → Graphical Automated Install
 ```
 
-Enter the preseed URL (this just automates a clean basic install using a the full drive size):
+Enter the preseed URL (this just automates a clean basic install using the full drive size):
 
 ```
 https://raw.githubusercontent.com/kevinsaucier/cloud/refs/heads/main/fpp_preseed.txt
@@ -35,7 +35,8 @@ https://raw.githubusercontent.com/kevinsaucier/cloud/refs/heads/main/fpp_preseed
 
 Login as `root` and run:
 
-Generate/Verify SSH key for root user
+Generate/Verify SSH key for root user:
+
 ```bash
 # Ensure root SSH key exists
 if ! ls /root/.ssh/id_*.pub >/dev/null 2>&1; then
@@ -45,7 +46,8 @@ if ! ls /root/.ssh/id_*.pub >/dev/null 2>&1; then
 fi
 ```
 
-To allow SSH access directly to the FPP host
+To allow SSH access directly to the FPP host:
+
 ```bash
 # Enable root SSH (preseed does NOT fully handle this)
 sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -53,39 +55,41 @@ sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/ss
 systemctl restart ssh
 ```
 
-
-
 ---
 
 ## 3. Install FPP
 
-Copy the script from github and give it execute permissions
+Copy the script from GitHub and give it execute permissions:
+
 ```bash
 cd /root
 wget -O /root/FPP_Install.sh https://raw.githubusercontent.com/FalconChristmas/fpp/master/SD/FPP_Install.sh
 chmod +x /root/FPP_Install.sh
 ```
 
-Patch for Debian 13 on VM compatibility (these steps fail when building on the VM so bypass the failures)
+Patch for Debian 13 on VM compatibility (these steps fail when building on the VM, so bypass the failures):
+
 ```bash
 sed -i 's/systemctl stop unattended-upgrades/systemctl stop unattended-upgrades || true/' /root/FPP_Install.sh
 sed -i 's/systemctl disable unattended-upgrades/systemctl disable unattended-upgrades || true/g' /root/FPP_Install.sh
 sed -i 's/systemctl disable beagle-flasher-init-shutdown.service/systemctl disable beagle-flasher-init-shutdown.service || true/' /root/FPP_Install.sh
 ```
 
-Install FPP
+Install FPP:
+
 ```bash
 ./FPP_Install.sh
 ```
 
-Reboot the VM
+Reboot the VM:
+
 ```bash
 reboot
 ```
 
 ---
 
-## 4. Verify FPP is Started and get the current IP 
+## 4. Verify FPP is Started and get the current IP
 
 ```bash
 systemctl status fppd --no-pager
@@ -104,8 +108,7 @@ http://<server-ip>
 
 ## 1. Copy the Script to a directory on the Primary server (I use /home/fpp)
 
-> SyncFPP_Primary2Backup
-
+> SyncFPP_Primary2Backup.sh
 
 Grant execute on Primary:
 
@@ -137,11 +140,47 @@ Expected result:
 
 ---
 
-## 3. Test Sync (you can include plugins if you like, but this may cause issues)
+## 3. Test Sync 
+### You can include plugins if you like, but this may cause issues on some plugins.
 
 ```bash
 /home/fpp/SyncFPP_Primary2Backup.sh <backup-ip> --include-plugins
 ```
+
+When using `--include-plugins`, you can also exclude one or more plugins by name.
+
+This is useful if:
+
+* A plugin is configured differently on each server
+* A plugin causes issues when copied between systems
+* You want to keep certain plugins local to a specific instance
+
+Example:
+
+```bash
+/home/fpp/SyncFPP_Primary2Backup.sh <backup-ip> --include-plugins --exclude-plugin remote-falcon
+```
+
+Multiple exclusions are supported:
+
+```bash
+/home/fpp/SyncFPP_Primary2Backup.sh <backup-ip> --include-plugins --exclude-plugin remote-falcon --exclude-plugin fpp-brightness
+```
+
+The script automatically translates each plugin name into the appropriate excludes for:
+
+* `/home/fpp/media/plugins/<plugin-name>`
+* `/home/fpp/media/config/plugin.<plugin-name>`
+* `/home/fpp/media/config/plugin.<plugin-name>.*`
+
+To see the current plugin names that can be excluded, run:
+
+```bash
+ls /home/fpp/media/plugins/
+```
+
+
+---
 
 ---
 
@@ -159,14 +198,17 @@ Add:
 
 ---
 
+
 # 🧠 Script Features
 
 * Incremental sync using `rsync`
 * File count reporting (per category)
 * Optional plugin sync (`--include-plugins`)
+* Optional plugin exclusions (`--exclude-plugin <name>`)
 * Dry-run mode (`--dry-run`)
 * Non-interactive mode for cron (`--non-interactive`)
 * Automatic log rotation (5 daily logs)
+* `latest` log symlink for easy viewing
 * SSH validation and setup guidance
 * Cron auto-install helper
 
@@ -188,7 +230,7 @@ Add:
 * config
 * scripts
 
-### Optional (coyping plugin data to a second server may cause problems.  Use with caution)
+### Optional (copying plugin data to a second server may cause issues depending on plugin configuration. Use with caution.)
 
 * plugins
 * plugindata
@@ -197,15 +239,10 @@ Add:
 
 # ⚠️ Notes / Gotchas
 
-## Debian Installer
-
-
 ## SSH Keys
 
-* Debian does NOT create root user SSH key
+* Debian does NOT create a root user SSH key
 * Must be created manually (see Post-Install section)
-
----
 
 ## FPP Installer Warnings
 
@@ -218,7 +255,6 @@ log4cpp-config: No such file or directory
 This is expected and non-fatal (library deprecation in progress).
 
 ---
-
 
 # 🔧 Architecture Overview
 
@@ -243,7 +279,7 @@ This setup provides:
 
 * Fully automated Debian install
 * Repeatable FPP deployment
-* Optional Primay to Backup server sync
+* Optional Primary to Backup server sync
 
 ---
 
