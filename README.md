@@ -184,7 +184,8 @@ ls /home/fpp/media/plugins/
 
 ---
 
-## 4. You can add the following to cron or you'll be prompted when running the script the first time
+## 4. You can add the following to cron
+### If you run the script manually, you'll be prompted to save the task to cron
 
 ```bash
 crontab -e
